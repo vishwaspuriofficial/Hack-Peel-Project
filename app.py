@@ -6,17 +6,9 @@ import datetime
 import pandas
 import os
 from humanize import naturalsize
-import threading
-from client import sendData 
 
-data = []
-dcounter = 0
-def listener():
-    global dcounter    
-    if len(data) > dcounter:
-        print("sending request")
-        print(sendData(data[-1]))
-    dcounter = len(data)
+def doThis():    
+        pass
 
 def storePref(lr,md,nf):
     with open("db.txt","w") as f:
@@ -32,7 +24,7 @@ def loadPref():
 def main():
     #Storage Buffer Check
     size = 0
-    storage = "Local Storage"
+    storage = "Local Storage/"
 
     for path, dirs, files in os.walk(storage):
         for f in files:
@@ -41,8 +33,7 @@ def main():
 
     # print("Folder size: " + naturalsize(size))
     if size>1000000000: #more than 1 gb
-        # doThis()
-        pass
+        doThis()
 
     startTime = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
     os.mkdir(f"{storage}/{startTime}")
@@ -55,6 +46,7 @@ def main():
     body_cascade = cv2.CascadeClassifier(
         cv2.data.haarcascades + "haarcascade_fullbody.xml")
 
+    data = []
     df = pandas.DataFrame(columns = ["Start", "End", "Face", "Recording"])
 
     lr,md,nf = loadPref()
@@ -95,7 +87,6 @@ def main():
     while True:
         event, values = window.read(timeout=20)
         if event == 'Exit' or event == sg.WIN_CLOSED:
-            
             storePref(lr,md,nf)
             print(lr,md,nf)
             return
@@ -140,8 +131,7 @@ def main():
                         out.release()
                         timeOut = datetime.datetime.now().strftime("%d-%m-%Y %H:%M:%S")
                         print(f'Stop Recording!')
-                        data.append([timeIn, timeOut, f"{storage}/{startTime}/Faces/face{counter}.jpg",f"{storage}/Recordings/face{counter}.png"])
-                    
+                        data.append([timeIn, timeOut, f"{storage}/{startTime}/Faces/face{counter}.png",f"{storage}/Recordings/face{counter}.png"])
                 else:
                     timer_started = True
                     detection_stopped_time = time.time()
@@ -164,7 +154,5 @@ def main():
     cv2.destroyAllWindows()
     storePref(int(lr),int(md),int(nf))
     # print(lr,md,nf)
-main = threading.Thread(target=main())
-listener = threading.Thread(target=listener())
-main.start()
-listener.start()
+
+main()
