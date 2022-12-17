@@ -16,12 +16,15 @@ face_cascade = cv2.CascadeClassifier(
 body_cascade = cv2.CascadeClassifier(
     cv2.data.haarcascades + "haarcascade_fullbody.xml")
 
+data = []
+df = pandas.DataFrame(columns = ["Start", "End", "Face", "Recording"])
+
 detection = False
 detection_stopped_time = None
 timer_started = False
 SECONDS_TO_RECORD_AFTER_DETECTION = 1
+# sct = mss()
 
-data = []
 cap.set(3, 1280)
 cap.set(4, 720)
 frame_size = (int(cap.get(3)), int(cap.get(4)))
@@ -75,6 +78,12 @@ while True:
         break
 print("Live Recording off!")
 print(data)
+
+for i in data:
+    df = df.append({"Start":i[0], "End":i[1], "Face":i[2], "Recording":i[3]}, ignore_index = True)
+endTime = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
+df.to_csv(f"{storage}/{startTime}/Security Data {startTime} to {endTime}.csv")
+
 out.release()
 cap.release()
 cv2.destroyAllWindows()
